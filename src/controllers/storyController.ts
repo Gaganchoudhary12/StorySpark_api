@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { storyOptions } from '../constants/storyOptions';
 import { generateStory } from '../services/storyService';
+import { getStoryOptions as getStoryOptionsFromDb } from '../services/storyOptionsService';
 import { saveStory, getStories } from '../services/storyStorageService';
+import { clearCache } from '../middleware/cache';
 import { AppError } from '../middleware/errorHandler';
 
 const storySchema = z.object({
@@ -10,6 +11,10 @@ const storySchema = z.object({
   relationship: z.string().min(1),
   theme: z.string().min(1),
   language: z.enum(['English', 'Hindi'])
+});
+
+const clearCacheSchema = z.object({
+  target: z.union([z.string().min(1), z.array(z.string().min(1))]).optional()
 });
 
 export const createStory = async (req: Request, res: Response, next: NextFunction) => {
@@ -54,6 +59,30 @@ export const getSavedStories = async (req: Request, res: Response, next: NextFun
   }
 };
 
-export const getStoryOptions = (_req: Request, res: Response) => {
-  return res.json(storyOptions);
+export const getStoryOptions = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const options = await getStoryOptionsFromDb();
+    return res.json(options);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const clearApiCache = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const parsed = clearCacheSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      throw new AppError('Invalid cache clear request body.', 400);
+    }
+
+    clearCache(parsed.data.target);
+
+    return res.json({
+      success: true,
+      cleared: parsed.data.target ?? 'all'
+    });
+  } catch (error) {
+    next(error);
+  }
 };
