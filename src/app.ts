@@ -1,0 +1,28 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+import storyRoutes from './routes/story';
+import { errorHandler } from './middleware/errorHandler';
+
+dotenv.config();
+
+const app = express();
+
+app.use(helmet());
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(morgan('dev'));
+app.use(express.json({ limit: '2mb' }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
+
+app.use('/api', storyRoutes);
+
+app.use(errorHandler);
+
+export default app;
