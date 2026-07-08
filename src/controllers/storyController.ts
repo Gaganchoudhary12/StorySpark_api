@@ -13,10 +13,6 @@ const storySchema = z.object({
   language: z.enum(['English', 'Hindi'])
 });
 
-const clearCacheSchema = z.object({
-  target: z.union([z.string().min(1), z.array(z.string().min(1))]).optional()
-});
-
 export const createStory = async (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log('[StoryController] Received request body:', req.body);
@@ -68,19 +64,13 @@ export const getStoryOptions = async (_req: Request, res: Response, next: NextFu
   }
 };
 
-export const clearApiCache = (req: Request, res: Response, next: NextFunction) => {
+export const clearApiCache = (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const parsed = clearCacheSchema.safeParse(req.body);
-
-    if (!parsed.success) {
-      throw new AppError('Invalid cache clear request body.', 400);
-    }
-
-    clearCache(parsed.data.target);
+    clearCache();
 
     return res.json({
       success: true,
-      cleared: parsed.data.target ?? 'all'
+      cleared: 'all'
     });
   } catch (error) {
     next(error);

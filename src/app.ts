@@ -10,11 +10,21 @@ import { errorHandler } from './middleware/errorHandler';
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
+app.disable('etag');
 
 app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '2mb' }));
+
+app.use('/api', (_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+});
 
 // Custom request logging middleware
 app.use((req, res, next) => {
