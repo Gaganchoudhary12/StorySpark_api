@@ -10,7 +10,7 @@ const storySchema = z.object({
   mood: z.string().min(1),
   relationship: z.string().min(1),
   theme: z.string().min(1),
-  language: z.enum(['English', 'Hindi'])
+  language: z.string().min(1)
 });
 
 export const createStory = async (req: Request, res: Response, next: NextFunction) => {
