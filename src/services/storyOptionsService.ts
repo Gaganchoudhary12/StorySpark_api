@@ -1,4 +1,3 @@
-import { storyOptions } from '../constants/storyOptions';
 import { StoryOptionsModel } from '../models/StoryOptions';
 
 export const getStoryOptions = async () => {
@@ -12,13 +11,4 @@ export const getStoryOptions = async () => {
       languages: existing.languages
     };
   }
-
-  const created = await StoryOptionsModel.create(storyOptions);
-
-  return {
-    moods: created.moods,
-    relationships: created.relationships,
-    themes: created.themes,
-    languages: created.languages
-  };
 };
