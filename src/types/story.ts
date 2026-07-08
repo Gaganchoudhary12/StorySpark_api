@@ -19,4 +19,5 @@ export interface StoryRequest {
   mood: string;
   relationship: string;
   theme: string;
+  language: string;
 }

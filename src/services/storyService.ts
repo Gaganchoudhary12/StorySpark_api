@@ -20,7 +20,7 @@ export const generateStory = async (input: StoryRequest): Promise<StoryResponse>
     const model = getModel();
     
     console.log('[StoryService] Building prompt with:', input);
-    const prompt = buildStoryPrompt(input.mood, input.relationship, input.theme);
+    const prompt = buildStoryPrompt(input.mood, input.relationship, input.theme, input.language);
     console.log('[StoryService] Prompt built, sending to Gemini API');
 
     const result = await model.generateContent(prompt);

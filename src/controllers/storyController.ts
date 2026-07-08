@@ -8,7 +8,8 @@ import { AppError } from '../middleware/errorHandler';
 const storySchema = z.object({
   mood: z.string().min(1),
   relationship: z.string().min(1),
-  theme: z.string().min(1)
+  theme: z.string().min(1),
+  language: z.enum(['English', 'Hindi'])
 });
 
 export const createStory = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +18,7 @@ export const createStory = async (req: Request, res: Response, next: NextFunctio
     const parsed = storySchema.safeParse(req.body);
     if (!parsed.success) {
       console.error('[StoryController] Validation failed:', parsed.error);
-      throw new AppError('Please choose a mood, relationship, and theme before generating a story.', 400);
+      throw new AppError('Please choose a mood, relationship, theme, and language before generating a story.', 400);
     }
 
     console.log('[StoryController] Starting story generation for:', parsed.data);
@@ -33,7 +34,8 @@ export const createStory = async (req: Request, res: Response, next: NextFunctio
       savedId: saved._id,
       mood: parsed.data.mood,
       relationship: parsed.data.relationship,
-      theme: parsed.data.theme
+      theme: parsed.data.theme,
+      language: parsed.data.language
     });
   } catch (error) {
     console.error('[StoryController] Error creating story:', error);

@@ -6,6 +6,7 @@ export const saveStory = async (input: StoryRequest, story: StoryResponse) => {
     mood: input.mood,
     relationship: input.relationship,
     theme: input.theme,
+    language: input.language,
     title: story.title,
     characters: story.characters,
     setting: story.setting,
@@ -21,6 +22,7 @@ export const getStories = async (filters?: Partial<StoryRequest>) => {
   if (filters?.mood) query.mood = filters.mood;
   if (filters?.relationship) query.relationship = filters.relationship;
   if (filters?.theme) query.theme = filters.theme;
+  if (filters?.language) query.language = filters.language;
 
   return StoryModel.find(query).sort({ createdAt: -1 }).lean();
 };

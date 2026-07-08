@@ -4,6 +4,7 @@ export interface IStory extends Document {
   mood: string;
   relationship: string;
   theme: string;
+  language: string;
   title: string;
   characters: Array<{ name: string; description: string }>;
   setting: string;
@@ -15,6 +16,7 @@ const storySchema = new Schema<IStory>({
   mood: { type: String, required: true },
   relationship: { type: String, required: true },
   theme: { type: String, required: true },
+  language: { type: String, required: true },
   title: { type: String, required: true },
   characters: [{ name: String, description: String }],
   setting: { type: String, required: true },
