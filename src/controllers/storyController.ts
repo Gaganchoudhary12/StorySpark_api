@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
+import { storyOptions } from '../constants/storyOptions';
 import { generateStory } from '../services/storyService';
 import { saveStory, getStories } from '../services/storyStorageService';
+import { AppError } from '../middleware/errorHandler';
 
 const storySchema = z.object({
   mood: z.string().min(1),
@@ -11,13 +13,20 @@ const storySchema = z.object({
 
 export const createStory = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('[StoryController] Received request body:', req.body);
     const parsed = storySchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: 'Invalid request body' });
+      console.error('[StoryController] Validation failed:', parsed.error);
+      throw new AppError('Please choose a mood, relationship, and theme before generating a story.', 400);
     }
 
+    console.log('[StoryController] Starting story generation for:', parsed.data);
     const story = await generateStory(parsed.data);
+    console.log('[StoryController] Story generated successfully');
+    
+    console.log('[StoryController] Saving story to database');
     const saved = await saveStory(parsed.data, story);
+    console.log('[StoryController] Story saved with ID:', saved._id);
 
     return res.json({
       ...story,
@@ -27,6 +36,7 @@ export const createStory = async (req: Request, res: Response, next: NextFunctio
       theme: parsed.data.theme
     });
   } catch (error) {
+    console.error('[StoryController] Error creating story:', error);
     next(error);
   }
 };
@@ -40,4 +50,8 @@ export const getSavedStories = async (req: Request, res: Response, next: NextFun
   } catch (error) {
     next(error);
   }
+};
+
+export const getStoryOptions = (_req: Request, res: Response) => {
+  return res.json(storyOptions);
 };

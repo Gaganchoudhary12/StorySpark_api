@@ -15,6 +15,21 @@ app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '2mb' }));
+
+// Custom request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log('Body:', req.body);
+  
+  const originalSend = res.send;
+  res.send = function(data) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} -> ${res.statusCode}`);
+    return originalSend.call(this, data);
+  };
+  
+  next();
+});
+
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 app.get('/health', (_req, res) => {
