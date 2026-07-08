@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import storyRoutes from './routes/story';
+import { connectDatabase } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -44,6 +45,15 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
+});
+
+app.use('/api', async (_req, _res, next) => {
+  try {
+    await connectDatabase();
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use('/api', storyRoutes);
