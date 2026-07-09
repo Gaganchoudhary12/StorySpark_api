@@ -21,10 +21,7 @@ export const connectDatabase = async () => {
     .connect(uri, {
       serverSelectionTimeoutMS: 10000
     })
-    .then((connection) => {
-      console.log('MongoDB connected');
-      return connection;
-    })
+    .then((connection) => connection)
     .catch((error) => {
       connectionPromise = null;
       console.error('MongoDB connection failed:', error);

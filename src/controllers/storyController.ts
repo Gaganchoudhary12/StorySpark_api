@@ -15,20 +15,33 @@ const storySchema = z.object({
 
 export const createStory = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('[StoryController] Received request body:', req.body);
     const parsed = storySchema.safeParse(req.body);
     if (!parsed.success) {
       console.error('[StoryController] Validation failed:', parsed.error);
       throw new AppError('Please choose a mood, relationship, theme, and language before generating a story.', 400);
     }
 
-    console.log('[StoryController] Starting story generation for:', parsed.data);
+    const options = await getStoryOptionsFromDb();
+    const { mood, relationship, theme, language } = parsed.data;
+
+    if (!options.moods.includes(mood)) {
+      throw new AppError('Selected mood is not available.', 400);
+    }
+
+    if (!options.relationships.includes(relationship)) {
+      throw new AppError('Selected relationship is not available.', 400);
+    }
+
+    if (!options.themes.includes(theme)) {
+      throw new AppError('Selected theme is not available.', 400);
+    }
+
+    if (!options.languages.includes(language)) {
+      throw new AppError('Selected language is not available.', 400);
+    }
+
     const story = await generateStory(parsed.data);
-    console.log('[StoryController] Story generated successfully');
-    
-    console.log('[StoryController] Saving story to database');
     const saved = await saveStory(parsed.data, story);
-    console.log('[StoryController] Story saved with ID:', saved._id);
 
     return res.json({
       ...story,

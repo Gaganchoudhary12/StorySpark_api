@@ -29,15 +29,6 @@ app.use('/api', (_req, res, next) => {
 
 // Custom request logging middleware
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  console.log('Body:', req.body);
-  
-  const originalSend = res.send;
-  res.send = function(data) {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} -> ${res.statusCode}`);
-    return originalSend.call(this, data);
-  };
-  
   next();
 });
 

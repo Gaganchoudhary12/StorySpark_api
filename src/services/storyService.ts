@@ -16,24 +16,13 @@ const getModel = () => {
 
 export const generateStory = async (input: StoryRequest): Promise<StoryResponse> => {
   try {
-    console.log('[StoryService] Initializing Gemini model');
     const model = getModel();
-    
-    console.log('[StoryService] Building prompt with:', input);
     const prompt = buildStoryPrompt(input.mood, input.relationship, input.theme, input.language);
-    console.log('[StoryService] Prompt built, sending to Gemini API');
 
     const result = await model.generateContent(prompt);
-    console.log('[StoryService] Received response from Gemini API');
-    
     const raw = result.response.text();
-    console.log('[StoryService] Raw response length:', raw.length);
-    
     const json = raw.replace(/```json|```/g, '').trim();
-    console.log('[StoryService] Cleaned JSON, parsing...');
-    
     const parsed = JSON.parse(json) as StoryResponse;
-    console.log('[StoryService] Successfully parsed story response');
 
     return parsed;
   } catch (error) {
